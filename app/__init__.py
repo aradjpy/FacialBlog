@@ -13,7 +13,7 @@ from flask_bootstrap import Bootstrap
 from flask_babel import Babel, lazy_gettext as _l
 
 
-login = LoginManager()
+# login = LoginManager()
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -34,6 +34,7 @@ def create_app(config_class=config):
     login.init_app(app) 
     login.login_view = 'main.login'
 
+    db.init_app(app)
     migrate.init_app(app, db)
     login.init_app(app)
     mail.init_app(app)
@@ -46,6 +47,9 @@ def create_app(config_class=config):
 
 
     with app.app_context():
+        db.create_all()
+
+
         if not current_app.debug:
             if app.config['MAIL_SERVER']:
                 auth = None
@@ -74,6 +78,7 @@ def create_app(config_class=config):
             app.logger.setLevel(logging.INFO)
             app.logger.info('YRN startup')
 
+        
     @app.shell_context_processor
     def make_shell_context():
         return {'db': db, 'User': models.User}
